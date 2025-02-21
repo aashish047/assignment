@@ -14,27 +14,7 @@ export default function ImageUploader() {
       setPreview(URL.createObjectURL(e.target.files[0]));
     }
   };
-  const handlePostToTwitter = async () => {
-    if (resizedImages.length === 0) return alert("No images to post!");
-  
-    try {
-      const response = await fetch("/api/twitter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ images: resizedImages }),
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        alert("Tweet posted successfully!");
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.error("Twitter post failed:", error);
-      alert("Failed to post to Twitter.");
-    }
-  };
+
   const handleUpload = async () => {
     if (!file) return alert("Please select an image");
 
@@ -50,6 +30,8 @@ export default function ImageUploader() {
       });
 
       const data = await response.json();
+      console.log("Response from API:", data); // Debugging output
+
       if (response.ok) {
         setResizedImages(data.images);
       } else {
@@ -75,16 +57,9 @@ export default function ImageUploader() {
       >
         {loading ? "Uploading..." : "Upload & Resize"}
       </button>
-      <button
-  onClick={handlePostToTwitter}
-  className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-  style={{width:"100%"}}
->
-  Post to Twitter
-</button>
       {resizedImages.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold">Resized Images:</h3>
+          <h3 className="text-lg font-semibold">Resized Images (Uploaded to ImgBB):</h3>
           {resizedImages.map((url, index) => (
             <img key={index} src={url} alt={`Resized ${index}`} className="mt-2 w-full" />
           ))}

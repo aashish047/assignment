@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import fs from "fs/promises";
+import axios from "axios";
+import FormData from "form-data";
 import path from "path";
+import fs from "fs/promises";
 
-// Allowed image sizes
+// ImgBB API Key (Replace with your key)
+const IMGBB_API_KEY = process.env.IMGBB_API_KEY ;
+
+// Predefined Image Sizes
 const PREDEFINED_SIZES = [
   { width: 300, height: 250 },
   { width: 728, height: 90 },
@@ -24,33 +29,41 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Define the uploads directory inside `public/`
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Save original image
-    const originalFileName = `original-${Date.now()}.png`;
-    const originalFilePath = path.join(uploadDir, originalFileName);
-    await fs.writeFile(originalFilePath, buffer);
-
-    // Process image resizing
+    // Temporary storage for resized images
     const resizedImages: string[] = [];
 
+    // Resize and upload each size to ImgBB
     for (const size of PREDEFINED_SIZES) {
-      const resizedFileName = `resized-${size.width}x${size.height}-${Date.now()}.png`;
-      const resizedFilePath = path.join(uploadDir, resizedFileName);
-
-      await sharp(originalFilePath)
+      const resizedBuffer = await sharp(buffer)
         .resize(size.width, size.height)
         .toFormat("png")
-        .toFile(resizedFilePath);
+        .toBuffer();
 
-      // Store accessible URL instead of file path
-      resizedImages.push(`/uploads/${resizedFileName}`);
+      // Convert buffer to a temporary file
+      const tempFilePath = path.join("/tmp", `resized-${size.width}x${size.height}.png`);
+      await fs.writeFile(tempFilePath, resizedBuffer);
+
+      // Upload to ImgBB
+      const imgFormData = new FormData();
+      imgFormData.append("image", await fs.readFile(tempFilePath), {
+        filename: `resized-${size.width}x${size.height}.png`,
+      });
+
+      const response = await axios.post(
+        `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`,
+        imgFormData,
+        { headers: imgFormData.getHeaders() }
+      );
+
+      // Store the uploaded image URL
+      resizedImages.push(response.data.data.url);
+
+      // Clean up temporary file
+      await fs.unlink(tempFilePath);
     }
 
     return NextResponse.json({
-      message: "Images resized successfully",
+      message: "Images resized and uploaded successfully",
       images: resizedImages,
     });
   } catch (error) {
