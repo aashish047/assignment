@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+/*import { NextRequest, NextResponse } from "next/server";
 import { TwitterApi } from "twitter-api-v2";
 import dotenv from "dotenv";
 import fs from "fs";
@@ -73,3 +73,4 @@ async function uploadImageToTwitter(imagePath: string): Promise<string | null> {
     return null;
   }
 }
+*/
