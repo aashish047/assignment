@@ -64,19 +64,21 @@ export default function ImageUploader() {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
+    <div className="p-4 max-w-md mx-auto" style={{display: "flex", flexDirection:"column",justifyContent:"center", alignItems:"center"}}>
+      <h1 style={{fontSize:"3vw", margin:"30px 10px 30px 10px"}}>Z1 Task Image Resizer</h1>
       <input type="file" accept="image/*" onChange={handleFileChange} className="mb-4" />
       {preview && <img src={preview} alt="Preview" className="mb-4 w-full" />}
       <button
         onClick={handleUpload}
         className="bg-blue-500 text-white px-4 py-2 rounded"
-        disabled={loading}
+        disabled={loading} style={{width:"100%"}}
       >
         {loading ? "Uploading..." : "Upload & Resize"}
       </button>
       <button
   onClick={handlePostToTwitter}
-  className="bg-blue-500 text-white px-4 py-2 rounded mt-4 ml-4"
+  className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+  style={{width:"100%"}}
 >
   Post to Twitter
 </button>
