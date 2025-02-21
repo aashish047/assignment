@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import axios from "axios";
@@ -6,7 +7,7 @@ import path from "path";
 import fs from "fs/promises";
 
 // ImgBB API Key (Replace with your key)
-const IMGBB_API_KEY = process.env.IMGBB_API_KEY ;
+const IMGBB_API_KEY = "dd037420099a45bef374b8b176b9677c";
 
 // Predefined Image Sizes
 const PREDEFINED_SIZES = [
